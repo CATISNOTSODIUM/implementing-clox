@@ -2,22 +2,32 @@
 #include "chunk.h"
 #include "debug.h"
 #include "vm.h"
+#include "trie.h"
+static void repl(){
+    char buf[1024];
+    while (true) {
+        printf("$ ");
+        if (!fgets(buf, sizeof(buf), stdin)){
+            printf("\n");
+            break;
+        }
+        interpret(buf);
+    }
+}
 
-int main() {
+int main(int argc, const char *argv[]) {
     // Initialize
     initVM();
-    Chunk chunk;
-    initChunk(&chunk);
-  
-    writeConstant(&chunk, 5, 1);
-    writeConstant(&chunk, 3, 1);
-    writeChunk(&chunk, OP_ADD, 1);
-    writeChunk(&chunk, OP_RETURN, 2);
-
-    // debugChunk(&chunk, "first chunk");
-    interpret(&chunk);
+    if (argc == 1) {
+        repl();
+    } else if (argc == 2) {
+        fprintf(stderr, "Not implemented yet\n");
+        // runFile(argv[1]);
+    } else {
+        fprintf(stderr, "Usage: clox [path]\n");
+        exit(64);
+    }
     // Free
     freeVM();
-    freeChunk(&chunk);
     return 0;
 }

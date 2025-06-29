@@ -87,12 +87,17 @@ static InterpretResult run() {
     #undef READ_CONSTANT
     #undef READ_BYTE
 }
-    
-InterpretResult interpret(Chunk * chunk) {
-    // Load chunk
-    vm.chunk = chunk;
-    vm.ip = chunk->code;
-    return run();
+
+InterpretResult interpret(const char *source) {
+    // Lexing and parsing
+    compile(source); 
+    return INTERPRET_OK;
+    /*
+        // Load chunk
+        vm.chunk = chunk;
+        vm.ip = chunk->code;
+        return run();
+    */
 }
 
 void push(Value value) {
