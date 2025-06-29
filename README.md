@@ -33,3 +33,28 @@ The content of the stack can be visualised as follows.
 [3]         Encounter +, pop the last two elements and replace with the result.
 ```
 You can enable `DEBUG_TRACE_STACK_EXECUTION` flag (in Makefile) in order to track the content inside the stack.  
+
+## Lexing
+Lexing is tedious. Nothing interesting here. 
+```c
+typedef struct {
+    const char * start;
+    const char * current;
+    uint line;
+} Lexer;
+
+// global variables
+Lexer lexer; 
+Trie identifierTrie;
+```
+The only thing that is different from the book is that I decided to use `Trie` to store all keywords and their corresponding tokens instead of hardcoded them.
+```c
+struct Trie {
+    bool is_key;
+    void * value;
+    Trie * children[TRIE_NUM_KEY];
+};
+```
+
+## Compiling
+At this stage, we have an array of tokens. We want to convert them to an array of bytecodes, such that these values can be processed by our VM.

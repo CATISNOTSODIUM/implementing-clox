@@ -1,7 +1,10 @@
 #ifndef clox_trie_h
 #define clox_trie_h
 
-#define TRIE_NUM_KEY 26
+#define TRIE_FIRST_CHAR 'a'
+#define TRIE_LAST_CHAR 'z'
+#define TRIE_NUM_KEY ((int)(TRIE_LAST_CHAR - TRIE_FIRST_CHAR + 1))
+
 #include "common.h"
 
 /**

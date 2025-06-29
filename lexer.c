@@ -2,7 +2,7 @@
 #include "string.h"
 #include "trie.h"
 
-Lexer lexer; // global variable
+Lexer lexer; 
 Trie identifierTrie;
 
 bool isEOF() {

@@ -15,13 +15,13 @@ void insertTrie(Trie *trie, const char * key, void * value) {
         return;
     }
     char c = key[0];
-    if (c < 'a' || c > 'z') {
+    if (c < TRIE_FIRST_CHAR || c > TRIE_LAST_CHAR) {
         return; // invalid key
     } 
-    if (trie->children[c - 'a'] == NULL) {
-        trie->children[c - 'a'] = malloc(sizeof(Trie));
+    if (trie->children[c - TRIE_FIRST_CHAR] == NULL) {
+        trie->children[c - TRIE_FIRST_CHAR] = malloc(sizeof(Trie));
     }
-    insertTrie(trie->children[c - 'a'], key + 1, value);
+    insertTrie(trie->children[c - TRIE_FIRST_CHAR], key + 1, value);
 }
 
 void * searchTrie(Trie *trie, const char * key) {
@@ -29,11 +29,11 @@ void * searchTrie(Trie *trie, const char * key) {
         return trie->is_key ? trie->value : NULL;
     } else {
         char c = key[0];
-        if (c < 'a' || c > 'z') {
+        if (c < TRIE_FIRST_CHAR || c > TRIE_LAST_CHAR) {
             return NULL; // invalid key
         }
-        return trie->children[c - 'a'] != NULL 
-                ? searchTrie(trie->children[c - 'a'], key + 1)
+        return trie->children[c - TRIE_FIRST_CHAR] != NULL 
+                ? searchTrie(trie->children[c - TRIE_FIRST_CHAR], key + 1)
                 : NULL;
     }
 }
