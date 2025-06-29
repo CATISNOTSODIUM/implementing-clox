@@ -40,16 +40,15 @@ static InterpretResult run() {
     while (true) {
         #ifdef DEBUG_TRACE_EXECUTION
             int offset = vm.ip - vm.chunk->code;
-            debugInstruction(vm.chunk, offset);
             #ifdef DEBUG_TRACE_STACK_EXECUTION
                 printf("[STACK] ");
                 for (Value *slot = vm.stack; slot < vm.stack_top; slot++) {
-                    printf("[ ");
                     printValue(*slot);
-                    printf(" ]");
+                    printf(" ");
                 }
-                printf("\n");
+                printf("\t");
             #endif
+            debugInstruction(vm.chunk, offset);
         #endif
 
         uint8_t ins;
@@ -90,14 +89,21 @@ static InterpretResult run() {
 
 InterpretResult interpret(const char *source) {
     // Lexing and parsing
-    compile(source); 
-    return INTERPRET_OK;
-    /*
-        // Load chunk
-        vm.chunk = chunk;
-        vm.ip = chunk->code;
-        return run();
-    */
+    Chunk chunk;
+    initChunk(&chunk);
+    bool compile_status = compile(source, &chunk); 
+    if (!compile_status) {
+        freeChunk(&chunk);
+        return INTERPRET_COMPILE_ERROR;
+    }
+    printf("FINISH COMPILING\n");
+    debugChunk(&chunk, "Debug after parsing");
+    // Load chunk
+    vm.chunk = &chunk;
+    vm.ip = chunk.code;
+    InterpretResult res = run();
+    freeChunk(&chunk);
+    return res;
 }
 
 void push(Value value) {

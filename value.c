@@ -10,8 +10,8 @@ void initValueArray(ValueArray * arr) {
 void writeValueArray(ValueArray * arr, Value value) {
     // expand its capacity if full
     if (arr->count + 1 > arr->capacity) {
-        size_t new_capacity = grow_capacity(arr->capacity); 
-        arr->values = (Value *) reallocate(arr->values, new_capacity);       
+        arr->capacity = grow_capacity(arr->capacity);
+        arr->values = (Value *)reallocate(arr->values, arr->capacity * sizeof(Value));
     }
     arr->values[arr->count] = value;
     arr->count++;
