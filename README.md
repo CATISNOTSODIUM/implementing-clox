@@ -1,4 +1,4 @@
-# Notes I've taken during reading the book
+# Notes I've taken during reading the [book](https://craftinginterpreters.com)
 ## The inspiration behinds Bytecode representation
 AST based interpreter is slow because it is not memory-efficient. Each piece of syntax becomes an AST node stored in a heap with lots of pointers between them. All of these problems are not cache-friendly.
 
@@ -18,3 +18,18 @@ Adding constant
 writeChunk(&chunk, OP_CONSTANT);
 writeChunk(&chunk, addConstant(&chunk, 1.2));
 ```
+
+## Virtual Machine (VM)
+Given an array of bytecodes, a mixture between operation code and location of values from constant pool, we use VM to traverse along this array and evaluate the program.
+
+We can achieve this by using a stack-based approach. This is quite similar to what we do with recursion-based AST evaluation, but we use stack to minimize traversal within a heap.
+
+Here is how our VM evaluate simple arithmetics. Given that your byte code is `[1, 2, +]`, the first two elements of the array (operands) are loaded into the stack before being evaluated by the operator `+`.
+The content of the stack can be visualised as follows.
+
+``` 
+[1]         1 is loaded.
+[1, 2]      2 is loaded.
+[3]         Encounter +, pop the last two elements and replace with the result.
+```
+You can enable `DEBUG_TRACE_STACK_EXECUTION` flag (in Makefile) in order to track the content inside the stack.  

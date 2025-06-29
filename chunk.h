@@ -7,6 +7,12 @@
 typedef enum {
     OP_CONSTANT,
     OP_RETURN,
+    // Arithmetic operation
+    OP_ADD,
+    OP_SUBTRACT,
+    OP_MULTIPLY,
+    OP_DIVIDE,
+    OP_NEGATE,
 } OpCode;
 
 
