@@ -279,7 +279,6 @@ bool compile(const char *source, Chunk * chunk) {
     advance(); // get token type of the first token (to initiate consume())
     expression();
     consume(TOKEN_EOF, "Expect end of expression.");
-    debugChunk(chunk, "chunk check");
     endCompiler();
     return !parser.had_error;
 }
