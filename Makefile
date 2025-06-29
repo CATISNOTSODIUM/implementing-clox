@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -std=c99 -g -DDEBUG_TRACE_STACK_EXECUTION
+CFLAGS = -std=c99 -g  -DDEBUG_TRACE_STACK_EXECUTION
 LDFLAGS = 
 
 # Directories

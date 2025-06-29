@@ -9,7 +9,6 @@ size_t grow_capacity(size_t old_size) {
 }
 
 void * reallocate(void * ptr, size_t new_size) {
-    
     if (new_size == 0) {
         free(ptr);
         return NULL; 

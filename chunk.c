@@ -1,5 +1,7 @@
 #include "chunk.h"
 #include "memory.h"
+#include "common.h"
+#include <stdio.h>
 
 void initChunk(Chunk * chunk) {
     chunk->count = 0;
@@ -12,9 +14,10 @@ void initChunk(Chunk * chunk) {
 void writeChunk(Chunk * chunk, uint8_t byte, int line) {
     // expand its capacity if full
     if (chunk->count + 1 > chunk->capacity) {
-        chunk->capacity = grow_capacity(chunk->capacity); 
-        chunk->code = (uint8_t *) reallocate(chunk->code, chunk->capacity);      
-        chunk->lines = (int *) reallocate(chunk->lines, chunk->capacity);      
+        size_t new_size = grow_capacity(chunk->capacity);
+        chunk->capacity = new_size;
+        chunk->code = (uint8_t *) reallocate(chunk->code, new_size * sizeof(uint8_t));
+        chunk->lines = (int *) reallocate(chunk->lines, new_size * sizeof(int));
     }
     
     chunk->code[chunk->count] = byte;
@@ -35,6 +38,10 @@ int addConstant(Chunk * chunk, Value value) {
 
 void writeConstant(Chunk * chunk, Value value, int line) {
     int loc = addConstant(chunk, value);
+    if (loc > UINT8_MAX) {
+        perror("Too many constants in one chunk.");
+        return;
+    }
     writeChunk(chunk, OP_CONSTANT, line);
     writeChunk(chunk, loc, line);
 }
