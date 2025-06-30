@@ -38,6 +38,7 @@ static InterpretResult run() {
     if (vm.ip == NULL) {
         return INTERPRET_RUNTIME_ERROR;
     }
+    resetStack();
     // define some helper functions
     // READ_BYTE reads the current byte code and increment pointer
     #define READ_BYTE() (*vm.ip++) 
@@ -46,7 +47,7 @@ static InterpretResult run() {
     // BINARY_OP(op) calculates basic arithmetics
     #define BINARY_OP(op) \
     do  {                 \
-        if (!IS_NUMBER(peek(0))) { \
+        if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) { \
             runtimeError("operand must be a number"); \
             return INTERPRET_RUNTIME_ERROR; \
         } \
@@ -55,7 +56,7 @@ static InterpretResult run() {
         push(NUMBER_VAL(a op b));     \
     } while (false)
 
-    while (true) {
+        while (true) {
         #ifdef DEBUG_TRACE_EXECUTION
             int offset = vm.ip - vm.chunk->code;
             #ifdef DEBUG_TRACE_STACK_EXECUTION
@@ -118,8 +119,7 @@ InterpretResult interpret(const char *source) {
         freeChunk(&chunk);
         return INTERPRET_COMPILE_ERROR;
     }
-    printf("FINISH COMPILING\n");
-    debugChunk(&chunk, "Debug after parsing");
+    // debugChunk(&chunk, "Debug after parsing");
     // Load chunk
     vm.chunk = &chunk;
     vm.ip = chunk.code;
@@ -144,5 +144,12 @@ Value pop() {
 }
 
 Value peek(uint offset) {
-    return vm.stack_top[-1-offset];
+    // safeguard way of checking this
+    uintptr_t top = (uintptr_t) vm.stack_top;
+    uintptr_t bottom = (uintptr_t) &vm.stack;
+    uintptr_t size = (top - bottom) / sizeof(Value);
+    if (size < offset) {
+        return NIL_VAL;
+    }
+    return *(vm.stack_top - offset);
 }
