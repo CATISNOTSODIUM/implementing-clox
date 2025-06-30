@@ -1,11 +1,25 @@
 #include "common.h"
 #include "vm.h"
 #include "debug.h"
+#include <stdarg.h>
 
 VM vm; // static global VM object
 
 static void resetStack() {
     vm.stack_top = vm.stack;
+}
+
+static void runtimeError(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fputs("\n", stderr);
+
+    size_t instruction = vm.ip - vm.chunk->code - 1;
+    int line = vm.chunk->lines[instruction];
+    fprintf(stderr, "[line %d] in script\n", line);
+    resetStack();
 }
 
 void initVM() {
@@ -32,9 +46,13 @@ static InterpretResult run() {
     // BINARY_OP(op) calculates basic arithmetics
     #define BINARY_OP(op) \
     do  {                 \
-        double b = pop(); \
-        double a = pop(); \
-        push(a op b);     \
+        if (!IS_NUMBER(peek(0))) { \
+            runtimeError("operand must be a number"); \
+            return INTERPRET_RUNTIME_ERROR; \
+        } \
+        double b = AS_NUMBER(pop()); \
+        double a = AS_NUMBER(pop()); \
+        push(NUMBER_VAL(a op b));     \
     } while (false)
 
     while (true) {
@@ -60,7 +78,11 @@ static InterpretResult run() {
             }
             // Arithmetic expression
             case OP_NEGATE: {
-                push(-pop());
+                if (!IS_NUMBER(peek(0))) {
+                    runtimeError("operand must be a number");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                push(NUMBER_VAL(-AS_NUMBER(pop())));
                 break;
             }
             case OP_ADD:
@@ -117,6 +139,10 @@ Value pop() {
         return *vm.stack_top;
     } else {
         perror("popping an empty stack is not allowed");
-        return 0;
+        return NIL_VAL;
     }
+}
+
+Value peek(uint offset) {
+    return vm.stack_top[-1-offset];
 }

@@ -13,7 +13,7 @@ void debugChunk(Chunk * chunk, const char * name) {
 */
 
 void printValue(Value value) {
-    printf("%g", value);
+    printf("%g", AS_NUMBER(value));
 }
 
 static int simpleInstruction(const char* name, int offset) {

@@ -38,5 +38,6 @@ InterpretResult interpret(const char *source);
 // Stack operations
 void push(Value value);
 Value pop();
+Value peek(uint offset);
 
 #endif
