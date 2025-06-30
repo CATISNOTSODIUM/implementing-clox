@@ -1,4 +1,5 @@
 #include "trie.h"
+#include "stdio.h"
 
 void initTrie(Trie *trie) {
     for (int i = 0; i < TRIE_NUM_KEY; i++) {
@@ -20,6 +21,11 @@ void insertTrie(Trie *trie, const char * key, void * value) {
     } 
     if (trie->children[c - TRIE_FIRST_CHAR] == NULL) {
         trie->children[c - TRIE_FIRST_CHAR] = malloc(sizeof(Trie));
+        if (trie->children[c - TRIE_FIRST_CHAR] == NULL) {
+            fprintf(stderr, "memory allocation failed\n");
+            exit(1);
+        }
+        initTrie(trie->children[c - TRIE_FIRST_CHAR]);
     }
     insertTrie(trie->children[c - TRIE_FIRST_CHAR], key + 1, value);
 }
@@ -32,9 +38,10 @@ void * searchTrie(Trie *trie, const char * key) {
         if (c < TRIE_FIRST_CHAR || c > TRIE_LAST_CHAR) {
             return NULL; // invalid key
         }
-        return trie->children[c - TRIE_FIRST_CHAR] != NULL 
+        void * result = trie->children[c - TRIE_FIRST_CHAR] != NULL 
                 ? searchTrie(trie->children[c - TRIE_FIRST_CHAR], key + 1)
                 : NULL;
+        return result;
     }
 }
 

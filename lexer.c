@@ -1,6 +1,7 @@
 #include "lexer.h"
 #include "string.h"
 #include "trie.h"
+#include <stdio.h>
 
 Lexer lexer; 
 Trie identifierTrie;
@@ -13,7 +14,7 @@ void initLexer(const char *source) {
     lexer.start = source;
     lexer.current = source;
     lexer.line = 1;
-    // Add relevant identifiers
+    // Add relevant identifiers (a slight overhead)
     initTrie(&identifierTrie);
     for (int i = 0; i < sizeof(keyword_tokens)/sizeof(TokenType); i++) {
         insertTrie(&identifierTrie, keyword_strings[i], &keyword_tokens[i]);
@@ -116,10 +117,15 @@ static Token number() {
 
 static TokenType identifierType() {
     uint length = lexer.current - lexer.start;
-    char * keyword = malloc(length + 1);
-    strncpy(keyword, lexer.start, length);
-    TokenType *token = (TokenType *) searchTrie(&identifierTrie, keyword);
-    return token == NULL ? TOKEN_IDENTIFIER : *token; 
+    char * keyword = malloc((length + 1) * sizeof(char));
+    if (keyword == NULL) {
+        fprintf(stderr, "memory allocation failed\n");
+        exit(1);
+    }
+    memcpy(keyword, lexer.start, sizeof(char) * length);
+    keyword[length] = '\0';
+    TokenType *token = (TokenType *)searchTrie(&identifierTrie, keyword);
+    return token == NULL ? TOKEN_IDENTIFIER : * token; 
 }
 
 static Token identifier() {
@@ -158,6 +164,8 @@ Token scanToken() {
             return makeToken(TOKEN_SLASH);
         case '*':
             return makeToken(TOKEN_STAR);
+        case '!':
+            return makeToken(TOKEN_BANG);
         // string
         case '"':
             return string();

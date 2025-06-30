@@ -86,6 +86,10 @@ static InterpretResult run() {
                 push(NUMBER_VAL(-AS_NUMBER(pop())));
                 break;
             }
+            // Simple literals
+            case OP_NIL: push(NIL_VAL); break;
+            case OP_TRUE: push(BOOL_VAL(true)); break;
+            case OP_FALSE: push(BOOL_VAL(false)); break;
             case OP_ADD:
                 BINARY_OP(+);
                 break;
@@ -98,7 +102,19 @@ static InterpretResult run() {
             case OP_DIVIDE:
                 BINARY_OP(/);
                 break;
-            case OP_RETURN: {
+            case OP_NOT: {
+                Value value = pop();
+                if (IS_NUMBER(value)) {
+                    runtimeError("operand must be a boolean");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                push(BOOL_VAL(
+                    IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value)
+                )));
+                break;
+            }
+            case OP_RETURN:
+            {
                 return INTERPRET_OK;
             }
         }
@@ -138,7 +154,7 @@ Value pop() {
         vm.stack_top--;
         return *vm.stack_top;
     } else {
-        perror("popping an empty stack is not allowed");
+        fprintf(stderr, "popping an empty stack is not allowed");
         return NIL_VAL;
     }
 }

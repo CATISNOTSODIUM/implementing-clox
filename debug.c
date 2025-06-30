@@ -13,7 +13,13 @@ void debugChunk(Chunk * chunk, const char * name) {
 */
 
 void printValue(Value value) {
-    printf("%g", AS_NUMBER(value));
+    if (IS_NUMBER(value)) {
+        printf("%g", AS_NUMBER(value));
+    } else if (IS_BOOL(value)) {
+        printf(AS_BOOL(value) ? "true" : "false");
+    } else if (IS_NIL(value)) {
+        printf("(nil)");
+    }
 }
 
 static int simpleInstruction(const char* name, int offset) {
@@ -53,6 +59,14 @@ int debugInstruction(Chunk * chunk, int offset) {
             return simpleInstruction("OP_DIVIDE", offset);
         case OP_CONSTANT:
             return constantInstruction("OP_CONSTANT", chunk, offset);
+        case OP_NIL:
+            return simpleInstruction("OP_NIL", offset);
+        case OP_TRUE:
+            return simpleInstruction("OP_TRUE", offset);
+        case OP_FALSE:
+            return simpleInstruction("OP_FALSE", offset);
+        case OP_NOT:
+            return simpleInstruction("OP_NOT", offset);
         default:
             printf("Unknown opcode %d\n", instruction);
         // proceed to next instruction

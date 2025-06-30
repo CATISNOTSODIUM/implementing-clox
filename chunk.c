@@ -39,7 +39,7 @@ int addConstant(Chunk * chunk, Value value) {
 void writeConstant(Chunk * chunk, Value value, int line) {
     int loc = addConstant(chunk, value);
     if (loc > UINT8_MAX) {
-        perror("Too many constants in one chunk.");
+        fprintf(stderr, "Too many constants in one chunk.");
         return;
     }
     writeChunk(chunk, OP_CONSTANT, line);
